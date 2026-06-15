@@ -401,8 +401,8 @@ elif portal == "🏢 Company Portal":
             
             if st.button("Login to Company Portal", type="primary"):
                 df = get_df("Companies")
-                if not df.empty:
-                    match = df[(df["email"] == email) & (df["password"] == password)]
+                if not df.empty and "email" in df.columns and "password" in df.columns:
+                    match = df[(df["email"].astype(str) == str(email)) & (df["password"].astype(str) == str(password))]
                     if not match.empty:
                         st.session_state.company_logged_in = True
                         st.session_state.current_company = match.iloc[0].to_dict()
@@ -465,7 +465,7 @@ elif portal == "🏢 Company Portal":
         """, unsafe_allow_html=True)
         
         agents_df = get_df("Agents")
-        company_agents = agents_df[agents_df["company_id"] == company.get("company_id", "")] if not agents_df.empty else pd.DataFrame()
+        company_agents = agents_df[agents_df["company_id"].astype(str) == str(company.get("company_id", ""))] if not agents_df.empty and "company_id" in agents_df.columns else pd.DataFrame()
         
         col1, col2, col3, col4 = st.columns(4)
         with col1:
@@ -556,8 +556,8 @@ elif portal == "👤 Agent Portal":
         
         if st.button("Login", type="primary"):
             df = get_df("Agents")
-            if not df.empty:
-                match = df[(df["employee_id"] == emp_id) & (df["password"] == password)]
+            if not df.empty and "employee_id" in df.columns and "password" in df.columns:
+                match = df[(df["employee_id"].astype(str) == str(emp_id)) & (df["password"].astype(str) == str(password))]
                 if not match.empty:
                     st.session_state.agent_logged_in = True
                     st.session_state.current_agent = match.iloc[0].to_dict()
@@ -574,8 +574,8 @@ elif portal == "👤 Agent Portal":
         
         companies_df = get_df("Companies")
         company = {}
-        if not companies_df.empty:
-            comp_match = companies_df[companies_df["company_id"] == agent.get("company_id", "")]
+        if not companies_df.empty and "company_id" in companies_df.columns:
+            comp_match = companies_df[companies_df["company_id"].astype(str) == str(agent.get("company_id", ""))]
             if not comp_match.empty:
                 company = comp_match.iloc[0].to_dict()
         
@@ -681,8 +681,8 @@ Estimated time: {est_time}
             st.markdown("<div class='veriq-card'>", unsafe_allow_html=True)
             st.markdown("### Visit History")
             visits_df = get_df("Visits")
-            if not visits_df.empty:
-                agent_visits = visits_df[visits_df["agent_id"] == agent.get("agent_id", "")]
+            if not visits_df.empty and "agent_id" in visits_df.columns:
+                agent_visits = visits_df[visits_df["agent_id"].astype(str) == str(agent.get("agent_id", ""))]
                 if not agent_visits.empty:
                     display_cols = ["customer_name", "purpose", "product", "status", "timestamp"]
                     available_cols = [c for c in display_cols if c in agent_visits.columns]
@@ -703,7 +703,7 @@ elif portal == "👁️ Customer View":
     st.markdown("### 👁️ Customer View — Agent Verification Page")
     st.caption("This is exactly what your customer sees when they scan the QR or open the WhatsApp link.")
     
-    if not agents_df.empty:
+    if not agents_df.empty and "full_name" in agents_df.columns:
         agent_options = agents_df["full_name"].tolist()
         selected_agent_name = st.selectbox("Select Agent to Preview", agent_options)
         agent_row = agents_df[agents_df["full_name"] == selected_agent_name].iloc[0].to_dict()
@@ -719,8 +719,8 @@ elif portal == "👁️ Customer View":
     st.markdown("</div>", unsafe_allow_html=True)
     
     company_row = {}
-    if not companies_df.empty and agent_row.get("company_id"):
-        comp_match = companies_df[companies_df["company_id"] == agent_row.get("company_id", "")]
+    if not companies_df.empty and "company_id" in companies_df.columns and agent_row.get("company_id"):
+        comp_match = companies_df[companies_df["company_id"].astype(str) == str(agent_row.get("company_id", ""))]
         if not comp_match.empty:
             company_row = comp_match.iloc[0].to_dict()
     
@@ -795,7 +795,7 @@ elif portal == "👁️ Customer View":
         """, unsafe_allow_html=True)
         
         visits_df = get_df("Visits")
-        agent_visits = visits_df[visits_df["agent_id"] == agent_row.get("agent_id", "")] if not visits_df.empty else pd.DataFrame()
+        agent_visits = visits_df[visits_df["agent_id"].astype(str) == str(agent_row.get("agent_id", ""))] if not visits_df.empty and "agent_id" in visits_df.columns else pd.DataFrame()
         latest_visit = agent_visits.iloc[-1].to_dict() if not agent_visits.empty else {}
         
         purpose = latest_visit.get("purpose", "KYC document collection & verification")
