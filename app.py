@@ -240,15 +240,23 @@ def get_gsheet_client():
 def get_sheet(sheet_name):
     client = get_gsheet_client()
     if client:
-        spreadsheet = client.open_by_url(SHEET_URL)
-        return spreadsheet.worksheet(sheet_name)
+        try:
+            spreadsheet = client.open_by_url(SHEET_URL)
+            return spreadsheet.worksheet(sheet_name)
+        except Exception as e:
+            st.error(f"Could not open sheet '{sheet_name}': {e}")
+            return None
     return None
 
 def get_df(sheet_name):
     sheet = get_sheet(sheet_name)
     if sheet:
-        data = sheet.get_all_records()
-        return pd.DataFrame(data)
+        try:
+            data = sheet.get_all_records()
+            return pd.DataFrame(data)
+        except Exception as e:
+            st.error(f"Could not read data from '{sheet_name}': {e}")
+            return pd.DataFrame()
     return pd.DataFrame()
 
 def append_row(sheet_name, row):
