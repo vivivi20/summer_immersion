@@ -868,7 +868,9 @@ elif portal == "👁️ Customer View":
             if st.button("❌ Decline", use_container_width=True):
                 st.error("Visit declined. You will not be disturbed.")
         with col3:
-            wa_url = f"https://wa.me/{company_row.get('helpline', '').replace(' ', '')}?text=I%20want%20to%20verify%20agent%20{agent_row.get('employee_id', '')}"
+            wa_url helpline = str(company_row.get("helpline", ""))
+
+wa_url = f"https://wa.me/{helpline.replace(' ', '')}?text=I%20want%20to%20verify%20agent%20{agent_row.get('employee_id', '')}"
             st.markdown(f"[💬 WhatsApp Company]({wa_url})")
         
         st.markdown(f"""
