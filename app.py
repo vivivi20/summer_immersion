@@ -409,6 +409,9 @@ elif portal == "🏢 Company Portal":
             
             if st.button("Login to Company Portal", type="primary"):
                 df = get_df("Companies")
+                st.write("DEBUG — Shape:", df.shape)
+                st.write("DEBUG — Columns:", list(df.columns))
+                st.write("DEBUG — Data:", df)
                 if not df.empty and "email" in df.columns and "password" in df.columns:
                     match = df[(df["email"].astype(str) == str(email)) & (df["password"].astype(str) == str(password))]
                     if not match.empty:
