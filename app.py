@@ -254,7 +254,7 @@ def get_df(sheet_name):
         try:
             data = sheet.get_all_records()
             df = pd.DataFrame(data)
-            df.columns = [str(c).strip() for c in df.columns]
+            df.columns = [str(c).strip().lower() for c in df.columns]
             return df
         except Exception as e:
             st.error(f"Could not read data from '{sheet_name}': {e}")
@@ -868,9 +868,7 @@ elif portal == "👁️ Customer View":
             if st.button("❌ Decline", use_container_width=True):
                 st.error("Visit declined. You will not be disturbed.")
         with col3:
-            wa_url helpline = str(company_row.get("helpline", ""))
-
-wa_url = f"https://wa.me/{helpline.replace(' ', '')}?text=I%20want%20to%20verify%20agent%20{agent_row.get('employee_id', '')}"
+            wa_url = f"https://wa.me/{company_row.get('helpline', '').replace(' ', '')}?text=I%20want%20to%20verify%20agent%20{agent_row.get('employee_id', '')}"
             st.markdown(f"[💬 WhatsApp Company]({wa_url})")
         
         st.markdown(f"""
