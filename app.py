@@ -253,7 +253,9 @@ def get_df(sheet_name):
     if sheet:
         try:
             data = sheet.get_all_records()
-            return pd.DataFrame(data)
+            df = pd.DataFrame(data)
+            df.columns = [str(c).strip() for c in df.columns]
+            return df
         except Exception as e:
             st.error(f"Could not read data from '{sheet_name}': {e}")
             return pd.DataFrame()
@@ -409,11 +411,8 @@ elif portal == "🏢 Company Portal":
             
             if st.button("Login to Company Portal", type="primary"):
                 df = get_df("Companies")
-                st.write("DEBUG — Shape:", df.shape)
-                st.write("DEBUG — Columns:", list(df.columns))
-                st.write("DEBUG — Data:", df)
                 if not df.empty and "email" in df.columns and "password" in df.columns:
-                    match = df[(df["email"].astype(str) == str(email)) & (df["password"].astype(str) == str(password))]
+                    match = df[(df["email"].astype(str).str.strip().str.lower() == str(email).strip().lower()) & (df["password"].astype(str).str.strip() == str(password).strip())]
                     if not match.empty:
                         st.session_state.company_logged_in = True
                         st.session_state.current_company = match.iloc[0].to_dict()
@@ -568,7 +567,7 @@ elif portal == "👤 Agent Portal":
         if st.button("Login", type="primary"):
             df = get_df("Agents")
             if not df.empty and "employee_id" in df.columns and "password" in df.columns:
-                match = df[(df["employee_id"].astype(str) == str(emp_id)) & (df["password"].astype(str) == str(password))]
+                match = df[(df["employee_id"].astype(str).str.strip() == str(emp_id).strip()) & (df["password"].astype(str).str.strip() == str(password).strip())]
                 if not match.empty:
                     st.session_state.agent_logged_in = True
                     st.session_state.current_agent = match.iloc[0].to_dict()
