@@ -221,6 +221,394 @@ st.markdown("""
 </style>
 """, unsafe_allow_html=True)
 
+st.markdown("""
+<style>
+    :root {
+        --ink: #172033;
+        --muted: #667085;
+        --line: #DDE5EE;
+        --panel: rgba(255,255,255,0.92);
+        --wash: #F5F7FB;
+        --brand: #12355B;
+        --brand-2: #1B998B;
+        --accent: #F5A524;
+        --danger: #D92D20;
+        --ok: #12805C;
+        --shadow: 0 18px 45px rgba(17, 34, 64, 0.10);
+        --shadow-soft: 0 8px 22px rgba(17, 34, 64, 0.08);
+    }
+
+    html, body, [class*="css"] {
+        color: var(--ink);
+    }
+
+    .stApp {
+        background:
+            radial-gradient(circle at 18% 12%, rgba(27,153,139,0.10), transparent 28%),
+            radial-gradient(circle at 85% 5%, rgba(245,165,36,0.12), transparent 24%),
+            linear-gradient(180deg, #F8FAFD 0%, #EEF3F8 100%);
+    }
+
+    [data-testid="stAppViewContainer"] > .main {
+        background: transparent;
+    }
+
+    [data-testid="stAppViewContainer"] .block-container {
+        max-width: 1240px;
+        padding: 2.2rem 2.4rem 4rem;
+    }
+
+    header[data-testid="stHeader"] {
+        background: rgba(248,250,253,0.72);
+        backdrop-filter: blur(16px);
+        border-bottom: 1px solid rgba(221,229,238,0.75);
+    }
+
+    #MainMenu, footer, [data-testid="stToolbar"], [data-testid="stDecoration"] {
+        visibility: hidden;
+        height: 0;
+    }
+
+    section[data-testid="stSidebar"] {
+        background:
+            linear-gradient(180deg, rgba(18,53,91,0.98) 0%, rgba(18,42,70,0.98) 54%, rgba(22,71,73,0.98) 100%) !important;
+        border-right: 1px solid rgba(255,255,255,0.12);
+        box-shadow: 14px 0 36px rgba(18, 53, 91, 0.18);
+    }
+
+    section[data-testid="stSidebar"] [data-testid="stSidebarContent"] {
+        padding: 1.5rem 1.1rem;
+    }
+
+    section[data-testid="stSidebar"] hr {
+        border-color: rgba(255,255,255,0.16);
+        margin: 1rem 0;
+    }
+
+    section[data-testid="stSidebar"] [role="radiogroup"] {
+        gap: 0.45rem;
+    }
+
+    section[data-testid="stSidebar"] label[data-baseweb="radio"] {
+        background: rgba(255,255,255,0.08);
+        border: 1px solid rgba(255,255,255,0.12);
+        border-radius: 12px;
+        padding: 0.58rem 0.7rem;
+        margin-bottom: 0.35rem;
+        transition: background 160ms ease, transform 160ms ease, border-color 160ms ease;
+    }
+
+    section[data-testid="stSidebar"] label[data-baseweb="radio"]:hover {
+        background: rgba(255,255,255,0.14);
+        border-color: rgba(255,255,255,0.26);
+        transform: translateX(2px);
+    }
+
+    .veriq-header {
+        background:
+            linear-gradient(135deg, rgba(18,53,91,0.98) 0%, rgba(31,94,112,0.96) 56%, rgba(27,153,139,0.95) 100%) !important;
+        border-radius: 18px !important;
+        padding: 24px 28px !important;
+        box-shadow: var(--shadow);
+        border: 1px solid rgba(255,255,255,0.22);
+        position: relative;
+        overflow: hidden;
+    }
+
+    .veriq-header::after {
+        content: "";
+        position: absolute;
+        right: -80px;
+        top: -80px;
+        width: 220px;
+        height: 220px;
+        background: rgba(255,255,255,0.12);
+        transform: rotate(32deg);
+        border-radius: 36px;
+    }
+
+    .veriq-card, .stat-box, .trust-metric {
+        background: var(--panel) !important;
+        border: 1px solid rgba(221,229,238,0.95) !important;
+        border-radius: 14px !important;
+        box-shadow: var(--shadow-soft) !important;
+        backdrop-filter: blur(12px);
+    }
+
+    .veriq-card {
+        padding: 26px !important;
+        margin-bottom: 18px !important;
+    }
+
+    .veriq-card:empty,
+    .element-container:has(.veriq-card:empty) {
+        display: none !important;
+        margin: 0 !important;
+        padding: 0 !important;
+    }
+
+    .verified-banner {
+        background: linear-gradient(135deg, #ECFDF6 0%, #F5FBF8 100%) !important;
+        border: 1px solid rgba(18,128,92,0.26) !important;
+        border-radius: 16px !important;
+        box-shadow: var(--shadow-soft);
+    }
+
+    .verified-badge, .live-indicator {
+        border-radius: 999px !important;
+        letter-spacing: 0.02em;
+        box-shadow: 0 7px 18px rgba(18,128,92,0.18);
+    }
+
+    .verified-badge {
+        background: linear-gradient(135deg, #12805C, #1B998B) !important;
+    }
+
+    .live-indicator {
+        background: rgba(255,255,255,0.16) !important;
+        border: 1px solid rgba(255,255,255,0.24);
+        color: #FFFFFF !important;
+    }
+
+    .section-title {
+        color: #526071 !important;
+        font-size: 12px !important;
+        letter-spacing: 0.12em !important;
+        margin-bottom: 14px !important;
+    }
+
+    h1, h2, h3 {
+        color: var(--ink);
+        letter-spacing: 0;
+    }
+
+    h3 {
+        font-size: 1.28rem !important;
+        margin-bottom: 0.85rem !important;
+    }
+
+    p, .stCaption, [data-testid="stCaptionContainer"] {
+        color: var(--muted);
+    }
+
+    .stat-box {
+        padding: 22px 18px !important;
+        transition: transform 160ms ease, box-shadow 160ms ease;
+    }
+
+    .stat-box:hover, .trust-metric:hover {
+        transform: translateY(-2px);
+        box-shadow: var(--shadow) !important;
+    }
+
+    .stat-number, .trust-metric-value, .agent-name, .company-name-large {
+        color: var(--brand) !important;
+    }
+
+    .stat-label, .trust-metric-label {
+        color: var(--muted) !important;
+        letter-spacing: 0.07em !important;
+    }
+
+    div[data-testid="stButton"] > button {
+        border-radius: 11px !important;
+        min-height: 44px;
+        border: 1px solid rgba(18,53,91,0.14) !important;
+        box-shadow: 0 7px 18px rgba(18,53,91,0.08);
+        transition: transform 140ms ease, box-shadow 140ms ease, border-color 140ms ease;
+    }
+
+    div[data-testid="stButton"] > button:hover {
+        transform: translateY(-1px);
+        border-color: rgba(27,153,139,0.45) !important;
+        box-shadow: 0 12px 24px rgba(18,53,91,0.12);
+    }
+
+    div[data-testid="stButton"] > button[kind="primary"] {
+        background: linear-gradient(135deg, #12355B 0%, #1B998B 100%) !important;
+        color: #FFFFFF !important;
+        border: 0 !important;
+    }
+
+    [data-baseweb="input"], [data-baseweb="select"], [data-baseweb="textarea"] {
+        border-radius: 12px !important;
+    }
+
+    [data-baseweb="input"] > div, [data-baseweb="select"] > div, textarea {
+        background: rgba(255,255,255,0.88) !important;
+        border: 1px solid rgba(221,229,238,1) !important;
+        border-radius: 12px !important;
+        box-shadow: inset 0 1px 0 rgba(255,255,255,0.76);
+    }
+
+    [data-baseweb="input"]:focus-within > div,
+    [data-baseweb="select"]:focus-within > div,
+    [data-baseweb="textarea"]:focus-within textarea {
+        border-color: rgba(27,153,139,0.65) !important;
+        box-shadow: 0 0 0 4px rgba(27,153,139,0.12) !important;
+    }
+
+    .stTabs [data-baseweb="tab-list"] {
+        gap: 8px;
+        background: rgba(255,255,255,0.64);
+        border: 1px solid rgba(221,229,238,0.92);
+        border-radius: 14px;
+        padding: 6px;
+        box-shadow: var(--shadow-soft);
+    }
+
+    .stTabs [data-baseweb="tab"] {
+        border-radius: 10px;
+        padding: 9px 14px;
+        color: #536173;
+        font-weight: 650;
+    }
+
+    .stTabs [aria-selected="true"] {
+        background: #FFFFFF;
+        color: var(--brand) !important;
+        box-shadow: 0 6px 14px rgba(18,53,91,0.10);
+    }
+
+    [data-testid="stAlert"] {
+        border-radius: 14px;
+        border: 1px solid rgba(221,229,238,0.92);
+        box-shadow: var(--shadow-soft);
+    }
+
+    [data-testid="stDataFrame"] {
+        border-radius: 14px;
+        overflow: hidden;
+        border: 1px solid var(--line);
+        box-shadow: var(--shadow-soft);
+    }
+
+    .detail-row {
+        border-bottom-color: #E8EEF5 !important;
+    }
+
+    .detail-label {
+        color: #6E7A89 !important;
+    }
+
+    .detail-value {
+        color: var(--ink) !important;
+    }
+
+    a {
+        color: #146C94 !important;
+        font-weight: 650;
+        text-decoration: none !important;
+    }
+
+    a:hover {
+        color: #1B998B !important;
+        text-decoration: underline !important;
+    }
+
+    .sidebar-brand {
+        padding: 18px 14px 20px;
+        border: 1px solid rgba(255,255,255,0.14);
+        border-radius: 18px;
+        background: rgba(255,255,255,0.08);
+        box-shadow: inset 0 1px 0 rgba(255,255,255,0.10);
+    }
+
+    .brand-mark {
+        width: 48px;
+        height: 48px;
+        margin: 0 auto 12px;
+        border-radius: 14px;
+        display: grid;
+        place-items: center;
+        background: linear-gradient(135deg, #FFFFFF, #DDF8F2);
+        color: #12355B;
+        font-size: 24px;
+        box-shadow: 0 12px 28px rgba(0,0,0,0.18);
+    }
+
+    .home-hero-copy {
+        max-width: 700px;
+        position: relative;
+        z-index: 1;
+    }
+
+    .home-kicker {
+        color: rgba(255,255,255,0.78);
+        font-size: 12px;
+        font-weight: 700;
+        letter-spacing: 0.14em;
+        text-transform: uppercase;
+        margin-bottom: 8px;
+    }
+
+    .home-title {
+        color: #FFFFFF;
+        font-size: 42px;
+        line-height: 1.06;
+        font-weight: 780;
+        letter-spacing: 0;
+        margin-bottom: 10px;
+    }
+
+    .home-subtitle {
+        color: rgba(255,255,255,0.78);
+        font-size: 15px;
+        line-height: 1.6;
+        max-width: 620px;
+    }
+
+    .home-flow {
+        display: grid;
+        grid-template-columns: repeat(3, minmax(0, 1fr));
+        gap: 14px;
+        margin-top: 12px;
+    }
+
+    .flow-step {
+        background: #F8FBFD;
+        border: 1px solid #E4ECF4;
+        border-radius: 12px;
+        padding: 18px;
+    }
+
+    .flow-number {
+        width: 34px;
+        height: 34px;
+        border-radius: 10px;
+        display: grid;
+        place-items: center;
+        background: #12355B;
+        color: #FFFFFF;
+        font-weight: 750;
+        margin-bottom: 12px;
+    }
+
+    @media (max-width: 800px) {
+        [data-testid="stAppViewContainer"] .block-container {
+            padding: 1.2rem 1rem 3rem;
+        }
+
+        .veriq-header {
+            padding: 20px !important;
+            display: block !important;
+        }
+
+        .veriq-card {
+            padding: 20px !important;
+        }
+
+        .home-title {
+            font-size: 32px;
+        }
+
+        .home-flow {
+            grid-template-columns: 1fr;
+        }
+    }
+</style>
+""", unsafe_allow_html=True)
+
 # ─── GOOGLE SHEETS CONNECTION ──────────────────────────────────────────────────
 SHEET_URL = "https://docs.google.com/spreadsheets/d/1OJgAYnbcykrAJZ3zniHPxIr4wWfIJZgjc6mUOD7caxY/edit"
 SCOPES = ["https://spreadsheets.google.com/feeds", "https://www.googleapis.com/auth/drive"]
@@ -331,10 +719,10 @@ if "view_agent_id" not in st.session_state:
 # ─── SIDEBAR ───────────────────────────────────────────────────────────────────
 with st.sidebar:
     st.markdown("""
-    <div style='text-align:center; padding: 20px 0;'>
-        <div style='font-size: 32px;'>🛡️</div>
-        <div style='font-size: 22px; font-weight: 700; color: white;'>VerIQ</div>
-        <div style='font-size: 11px; color: #94A3B8; letter-spacing: 1px;'>VERIFIED IDENTITY</div>
+    <div class='sidebar-brand' style='text-align:center;'>
+        <div class='brand-mark'>🛡️</div>
+        <div style='font-size: 24px; font-weight: 780; color: white; letter-spacing: 0;'>VerIQ</div>
+        <div style='font-size: 11px; color: rgba(255,255,255,0.62); letter-spacing: 1.8px; margin-top: 3px;'>VERIFIED IDENTITY</div>
     </div>
     """, unsafe_allow_html=True)
     
@@ -366,9 +754,10 @@ with st.sidebar:
 if portal == "🏠 Home":
     st.markdown("""
     <div class='veriq-header'>
-        <div>
-            <div style='font-size: 28px; font-weight: 700;'>🛡️ VerIQ</div>
-            <div style='font-size: 14px; color: #94A3B8; margin-top: 4px;'>Bridging the trust gap in field sales — one verified identity at a time</div>
+        <div class='home-hero-copy'>
+            <div class='home-kicker'>Verified field identity</div>
+            <div class='home-title'>VerIQ</div>
+            <div class='home-subtitle'>A clean trust layer for companies, field agents, and customers. Register teams, issue verified agent profiles, and let customers confirm identity before every visit.</div>
         </div>
         <div class='live-indicator'>● LIVE</div>
     </div>
@@ -405,19 +794,19 @@ if portal == "🏠 Home":
     st.markdown("""
     <div class='veriq-card'>
         <div class='section-title'>How VerIQ Works</div>
-        <div style='display: grid; grid-template-columns: repeat(3, 1fr); gap: 16px; margin-top: 12px;'>
-            <div style='text-align: center; padding: 16px;'>
-                <div style='font-size: 28px;'>1️⃣</div>
+        <div class='home-flow'>
+            <div class='flow-step'>
+                <div class='flow-number'>1</div>
                 <div style='font-weight: 600; color: #0A2342; margin: 8px 0;'>Company Registers</div>
                 <div style='font-size: 13px; color: #6B7280;'>Company verifies itself with GST and CIN documents</div>
             </div>
-            <div style='text-align: center; padding: 16px;'>
-                <div style='font-size: 28px;'>2️⃣</div>
+            <div class='flow-step'>
+                <div class='flow-number'>2</div>
                 <div style='font-weight: 600; color: #0A2342; margin: 8px 0;'>Agent Gets Profile</div>
                 <div style='font-size: 13px; color: #6B7280;'>Each agent gets a live verified digital identity card</div>
             </div>
-            <div style='text-align: center; padding: 16px;'>
-                <div style='font-size: 28px;'>3️⃣</div>
+            <div class='flow-step'>
+                <div class='flow-number'>3</div>
                 <div style='font-weight: 600; color: #0A2342; margin: 8px 0;'>Customer Trusts</div>
                 <div style='font-size: 13px; color: #6B7280;'>Customer scans QR or receives WhatsApp link before visit</div>
             </div>
