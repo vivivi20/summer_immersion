@@ -9,6 +9,7 @@ import uuid
 from datetime import datetime
 import json
 import os
+import re
 
 # ─── PAGE CONFIG ───────────────────────────────────────────────────────────────
 st.set_page_config(
@@ -252,9 +253,9 @@ def get_df(sheet_name):
     sheet = get_sheet(sheet_name)
     if sheet:
         try:
-            data = sheet.get_all_records()
+            data = sheet.get_all_records(numericise_ignore=["all"])
             df = pd.DataFrame(data)
-            df.columns = [str(c).strip().lower() for c in df.columns]
+            df.columns = [normalize_column_name(c) for c in df.columns]
             return df
         except Exception as e:
             st.error(f"Could not read data from '{sheet_name}': {e}")
@@ -274,6 +275,33 @@ def update_cell(sheet_name, row_idx, col_idx, value):
         sheet.update_cell(row_idx, col_idx, value)
         return True
     return False
+
+def normalize_column_name(value):
+    text = str(value).strip().lower()
+    return re.sub(r"[^a-z0-9]+", "_", text).strip("_")
+
+def normalize_cell(value):
+    if pd.isna(value):
+        return ""
+    text = str(value).replace("\u00a0", " ").replace("\u200b", "").strip()
+    if text.startswith("'"):
+        text = text[1:].strip()
+    if text.endswith(".0") and text[:-2].isdigit():
+        return text[:-2]
+    return text
+
+def normalize_lookup_id(value):
+    text = normalize_cell(value).upper()
+    if text.isdigit():
+        return text.lstrip("0") or "0"
+    return text
+
+def first_existing_column(df, names):
+    for name in names:
+        normalized = normalize_column_name(name)
+        if normalized in df.columns:
+            return normalized
+    return None
 
 # ─── QR CODE GENERATOR ─────────────────────────────────────────────────────────
 def generate_qr(data):
@@ -411,8 +439,13 @@ elif portal == "🏢 Company Portal":
             
             if st.button("Login to Company Portal", type="primary"):
                 df = get_df("Companies")
-                if not df.empty and "email" in df.columns and "password" in df.columns:
-                    match = df[(df["email"].astype(str).str.strip().str.lower() == str(email).strip().lower()) & (df["password"].astype(str).str.strip() == str(password).strip())]
+                email_col = first_existing_column(df, ["email", "company_email", "company email"])
+                password_col = first_existing_column(df, ["password", "company_password", "company password"])
+                if not df.empty and email_col and password_col:
+                    match = df[
+                        (df[email_col].apply(normalize_cell).str.lower() == normalize_cell(email).lower()) &
+                        (df[password_col].apply(normalize_cell) == normalize_cell(password))
+                    ]
                     if not match.empty:
                         st.session_state.company_logged_in = True
                         st.session_state.current_company = match.iloc[0].to_dict()
@@ -475,7 +508,7 @@ elif portal == "🏢 Company Portal":
         """, unsafe_allow_html=True)
         
         agents_df = get_df("Agents")
-        company_agents = agents_df[agents_df["company_id"].astype(str) == str(company.get("company_id", ""))] if not agents_df.empty and "company_id" in agents_df.columns else pd.DataFrame()
+        company_agents = agents_df[agents_df["company_id"].apply(normalize_lookup_id) == normalize_lookup_id(company.get("company_id", ""))] if not agents_df.empty and "company_id" in agents_df.columns else pd.DataFrame()
         
         col1, col2, col3, col4 = st.columns(4)
         with col1:
@@ -566,17 +599,26 @@ elif portal == "👤 Agent Portal":
         
         if st.button("Login", type="primary"):
             df = get_df("Agents")
-            if not df.empty and "employee_id" in df.columns and "password" in df.columns:
-                match = df[(df["employee_id"].astype(str).str.strip() == str(emp_id).strip()) & (df["password"].astype(str).str.strip() == str(password).strip())]
+            employee_id_col = first_existing_column(df, ["employee_id", "employee id", "emp_id", "emp id", "employee"])
+            password_col = first_existing_column(df, ["password", "agent_password", "agent password", "passcode", "pin"])
+            if not df.empty and employee_id_col and password_col:
+                employee_match = df[
+                    df[employee_id_col].apply(normalize_lookup_id) == normalize_lookup_id(emp_id)
+                ]
+                match = employee_match[
+                    employee_match[password_col].apply(normalize_cell) == normalize_cell(password)
+                ]
                 if not match.empty:
                     st.session_state.agent_logged_in = True
                     st.session_state.current_agent = match.iloc[0].to_dict()
                     st.success("Login successful!")
                     st.rerun()
+                elif not employee_match.empty:
+                    st.error("Employee ID found, but password does not match.")
                 else:
-                    st.error("Invalid Employee ID or password.")
+                    st.error("Employee ID not found in the Agents sheet.")
             else:
-                st.error("No agents found.")
+                st.error("Could not find Employee ID and Password columns in the Agents sheet.")
         st.markdown("</div>", unsafe_allow_html=True)
     
     else:
@@ -585,7 +627,7 @@ elif portal == "👤 Agent Portal":
         companies_df = get_df("Companies")
         company = {}
         if not companies_df.empty and "company_id" in companies_df.columns:
-            comp_match = companies_df[companies_df["company_id"].astype(str) == str(agent.get("company_id", ""))]
+            comp_match = companies_df[companies_df["company_id"].apply(normalize_lookup_id) == normalize_lookup_id(agent.get("company_id", ""))]
             if not comp_match.empty:
                 company = comp_match.iloc[0].to_dict()
         
@@ -692,7 +734,7 @@ Estimated time: {est_time}
             st.markdown("### Visit History")
             visits_df = get_df("Visits")
             if not visits_df.empty and "agent_id" in visits_df.columns:
-                agent_visits = visits_df[visits_df["agent_id"].astype(str) == str(agent.get("agent_id", ""))]
+                agent_visits = visits_df[visits_df["agent_id"].apply(normalize_lookup_id) == normalize_lookup_id(agent.get("agent_id", ""))]
                 if not agent_visits.empty:
                     display_cols = ["customer_name", "purpose", "product", "status", "timestamp"]
                     available_cols = [c for c in display_cols if c in agent_visits.columns]
@@ -730,7 +772,7 @@ elif portal == "👁️ Customer View":
     
     company_row = {}
     if not companies_df.empty and "company_id" in companies_df.columns and agent_row.get("company_id"):
-        comp_match = companies_df[companies_df["company_id"].astype(str) == str(agent_row.get("company_id", ""))]
+        comp_match = companies_df[companies_df["company_id"].apply(normalize_lookup_id) == normalize_lookup_id(agent_row.get("company_id", ""))]
         if not comp_match.empty:
             company_row = comp_match.iloc[0].to_dict()
     
@@ -805,7 +847,7 @@ elif portal == "👁️ Customer View":
         """, unsafe_allow_html=True)
         
         visits_df = get_df("Visits")
-        agent_visits = visits_df[visits_df["agent_id"].astype(str) == str(agent_row.get("agent_id", ""))] if not visits_df.empty and "agent_id" in visits_df.columns else pd.DataFrame()
+        agent_visits = visits_df[visits_df["agent_id"].apply(normalize_lookup_id) == normalize_lookup_id(agent_row.get("agent_id", ""))] if not visits_df.empty and "agent_id" in visits_df.columns else pd.DataFrame()
         latest_visit = agent_visits.iloc[-1].to_dict() if not agent_visits.empty else {}
         
         purpose = latest_visit.get("purpose", "KYC document collection & verification")
@@ -892,4 +934,3 @@ elif portal == "👁️ Customer View":
         </div>
         """, unsafe_allow_html=True)
         st.markdown("</div>", unsafe_allow_html=True)
-
